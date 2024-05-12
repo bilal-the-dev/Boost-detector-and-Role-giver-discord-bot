@@ -18,6 +18,7 @@ module.exports = {
 			type: ApplicationCommandOptionType.Role,
 		},
 	],
+	permissionsRequired: [PermissionFlagsBits.Administrator],
 
 	callback: async (_, interaction) => {
 		const role = interaction.options.get("role").value;

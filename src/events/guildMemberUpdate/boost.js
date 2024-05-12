@@ -9,8 +9,9 @@ const { sendNoLimitEmbed, successEmbed } = require("../../utils/embed");
  * @param {Message} message
  */
 
-module.exports = async (oldMember, member) => {
+module.exports = async (_, oldMember, member) => {
 	try {
+		console.log(member.user.username);
 		console.log("member update");
 		const {
 			user: { id: userId },
@@ -18,27 +19,41 @@ module.exports = async (oldMember, member) => {
 			premiumSince,
 		} = member;
 
-		console.log(premiumSince);
-
+		console.log(oldMember);
 		const oldBoostStatus = oldMember.premiumSince;
 		const hasSartedBoosting = !oldBoostStatus && premiumSince;
 		const hasEndedBoosting = oldBoostStatus && !premiumSince;
+		console.log({
+			hasEndedBoosting,
+			hasSartedBoosting,
+			oldBoostStatus,
+			premiumSince,
+		});
 
 		if (!hasSartedBoosting && !hasEndedBoosting) return;
 
+		console.log("member update boost yes");
 		const { BOOST_LIMIT, BOOST_CHECK_ROLE_ID, BOOST_ROLE_ID } = data;
 		const boostedAt = new Date();
 
 		// filling cache
 		await guild.members.fetch();
 		let doc = await boost.findOne({ userId });
+		console.log(doc);
 		const BOOST_ROLE = await guild.roles.fetch(BOOST_ROLE_ID);
 		const isLimitRemaining = BOOST_LIMIT > BOOST_ROLE.members.size;
 
 		const hasCheckRole = member.roles.cache.has(BOOST_CHECK_ROLE_ID);
 		const hasBoostRole = member.roles.cache.has(BOOST_ROLE_ID);
 
+		console.log({
+			hasCheckRole,
+			hasBoostRole,
+			isLimitRemaining,
+			size: BOOST_ROLE.members.size,
+		});
 		if (hasSartedBoosting) {
+			console.log("started boosting");
 			// check if document exists
 			if (!doc)
 				doc = new boost({
@@ -62,6 +77,7 @@ module.exports = async (oldMember, member) => {
 		}
 
 		if (hasEndedBoosting) {
+			console.log("removed boost");
 			if (doc) await doc.deleteOne();
 
 			if (!hasBoostRole) return;
@@ -85,7 +101,9 @@ module.exports = async (oldMember, member) => {
 					const hasCheckRole = member.roles.cache.has(BOOST_CHECK_ROLE_ID);
 					const hasBoostRole = member.roles.cache.has(BOOST_ROLE_ID);
 
+					cl(hasBoostRole);
 					if (!member || hasCheckRole || hasBoostRole) continue;
+					console.log("passed the end loop");
 					await member.roles.add(BOOST_ROLE_ID);
 					await userDoc.updateOne({ hasBoostRole: true });
 					await successEmbed(member);

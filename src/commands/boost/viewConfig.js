@@ -3,6 +3,7 @@ const data = require("./../../../config.json");
 module.exports = {
 	name: "view_config",
 	description: "view the configuration",
+	permissionsRequired: [PermissionFlagsBits.Administrator],
 
 	callback: async (_, interaction) => {
 		const { BOOST_LIMIT, BOOST_CHECK_ROLE_ID, BOOST_ROLE_ID } = data;

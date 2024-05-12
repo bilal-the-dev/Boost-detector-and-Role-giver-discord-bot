@@ -17,6 +17,7 @@ module.exports = {
 		},
 	],
 
+	permissionsRequired: [PermissionFlagsBits.Administrator],
 	callback: async (_, interaction) => {
 		const limit = interaction.options.get("limit").value;
 
